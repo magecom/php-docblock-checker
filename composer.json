@@ -1,5 +1,5 @@
 {
-  "name": "dancryer/php-docblock-checker",
+  "name": "magecom/php-docblock-checker",
   "description": "A simple tool for checking that your PHP classes and methods use docblocks.",
   "minimum-stability": "stable",
   "type": "library",
