@@ -175,7 +175,10 @@ class FileParser
                         ) {
                             $type .= '|null';
                         }
-
+                        if ($param->type instanceof NullableType) {
+                            $type = ['null', $type];
+                            sort($type);
+                        }
                         $name = null;
                         // parser v3
                         if (property_exists($param, 'name')) {
