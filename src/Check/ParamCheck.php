@@ -29,16 +29,11 @@ class ParamCheck extends Check
                 }
 
                 if (!empty($type)) {
-                    $docBlockTypes = explode('|', $method['docblock']['params'][$param]);
-                    $methodTypes = explode('|', $type);
-
-                    sort($docBlockTypes);
-                    sort($methodTypes);
-
-                    if ($docBlockTypes !== $methodTypes) {
-                        if ($type === 'array' && substr($method['docblock']['params'][$param], -2) === '[]') {
-                            // Do nothing because this is fine.
-                        } else {
+                    if (is_array($type)) {
+                        $docBlockTypes = explode('|', $method['docblock']['params'][$param]);
+                        sort($docBlockTypes);
+                        sort($type);
+                        if ($type !== $docBlockTypes) {
                             $this->fileStatus->add(
                                 new ParamMismatchWarning(
                                     $file->getFileName(),
@@ -46,10 +41,31 @@ class ParamCheck extends Check
                                     $method['line'],
                                     $name,
                                     $param,
-                                    $type,
+                                    implode('|', $type),
                                     $method['docblock']['params'][$param]
                                 )
                             );
+                            continue;
+                        }
+                    }
+
+                    if ($method['docblock']['params'][$param] !== $type) {
+                        if ($type === 'array' && substr($method['docblock']['params'][$param], -2) === '[]') {
+                            // Do nothing because this is fine.
+                        } else {
+                            if (!is_array($type) || !$this->checkMultipleParamStatements($method, $param)) {
+                                $this->fileStatus->add(
+                                    new ParamMismatchWarning(
+                                        $file->getFileName(),
+                                        $name,
+                                        $method['line'],
+                                        $name,
+                                        $param,
+                                        $type,
+                                        $method['docblock']['params'][$param]
+                                    )
+                                );
+                            }
                         }
                     }
                 }
@@ -63,5 +79,18 @@ class ParamCheck extends Check
     public function enabled()
     {
         return !$this->config->isSkipSignatures();
+    }
+
+    /**
+     * @param array $method
+     * @param string $param
+     * @return bool
+     */
+    private function checkMultipleParamStatements(array $method, $param): bool
+    {
+        $dockParam = explode('|', $method['docblock']['params'][$param]);
+        $methodParam = $method['params'][$param];
+
+        return count(array_diff($dockParam, $methodParam)) == 0 && count(array_diff($methodParam, $dockParam)) == 0;
     }
 }
