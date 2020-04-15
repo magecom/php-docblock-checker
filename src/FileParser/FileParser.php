@@ -254,7 +254,7 @@ class FileParser
     {
         $tagCollection = $this->docblockParser->parseComment($text);
 
-        if ($tagCollection->hasTag('inheritdoc')) {
+        if ($tagCollection->hasTag('inheritdoc') || $tagCollection->hasTag('inheritDoc')) {
             return ['inherit' => true];
         }
 
