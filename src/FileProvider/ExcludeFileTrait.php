@@ -21,14 +21,14 @@ trait ExcludeFileTrait
             return true;
         }
 
-        $filePath = str_replace($baseDirectory, '', $file->getPathname());
+        $filePath = trim(str_replace($file->getFilename(), ' ', $file->getPathname()));
 
         if (in_array($filePath, $this->excludes, true)) {
             return true;
         }
 
         foreach ($this->excludes as $pattern) {
-            if (fnmatch($pattern, $filePath)) {
+            if (fnmatch($pattern, $filePath) || strpos($filePath, $pattern) !== false) {
                 return true;
             }
         }
