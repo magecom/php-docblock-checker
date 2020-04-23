@@ -15,6 +15,10 @@ class ReturnCheck extends Check
     public function check(FileInfo $file)
     {
         foreach ($file->getMethods() as $name => $method) {
+            if (isset($method['docblock']['inherit']) && $method['docblock']['inherit']) {
+                continue;
+            }
+
             if (!empty($method['return'])) {
                 if (empty($method['docblock']['return'])) {
                     $this->fileStatus->add(
