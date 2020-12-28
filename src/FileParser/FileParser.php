@@ -175,7 +175,8 @@ class FileParser
                         ) {
                             $type .= '|null';
                         }
-                        if ($param->type instanceof NullableType) {
+                        if ($param->type instanceof NullableType &&
+                            strpos($type, 'null') === false) {
                             $type = ['null', $type];
                             sort($type);
                         }
